@@ -83,6 +83,8 @@ function loop() {
 		videoTexture.flipY = false;
 		//console.log(texture);
 		obj.children[13].children[2].material.emissiveMap = videoTexture;
+		obj.children[12].children[2].material.emissiveMap = videoTexture;
+		obj.children[11].children[2].material.emissiveMap = videoTexture;
 	}
 	
 	requestAnimationFrame(loop);
