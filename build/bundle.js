@@ -45005,15 +45005,12 @@
 				}
 			);
 			
-			console.log(video.readyState);
-			renderer.render(scene, camera);
-
 			loop();
 		}
 	}
 
 	function loop() {	
-		if (obj !== undefined && !loaded) //&& video.load() !== undefined
+		if (obj !== undefined && !loaded) //&& && video.readyState == 4 !== undefined
 		{
 			loaded = true;
 			//console.log(obj.children[15].children[2]);
@@ -45032,8 +45029,8 @@
 			obj.children[15].children[2].material.emissiveMap = text1;
 			obj.children[14].children[2].material.emissiveMap = text2;
 			
-			console.log(video.readyState);
 			videoTexture = new VideoTexture( video );
+			console.log(videoTexture);
 			videoTexture.flipY = false;
 			//console.log(texture);
 			obj.children[13].children[2].material.emissiveMap = videoTexture;
