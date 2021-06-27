@@ -44975,9 +44975,9 @@
 			camera.position.set( 0, 5, 18 );
 			camera.lookAt( 0, 0, 0 );
 
-			const light = new AmbientLight( 0x404040 );
-			light.position.set(0, 0, 0);
-			light.intensity = 4;
+			const light = new PointLight( 0xffffff );
+			light.position.set(0, 5, 5);
+			light.intensity = 2;
 			scene.add( light );
 
 			//scene
@@ -44994,6 +44994,8 @@
 					gltf.scenes; // Array<THREE.Group>
 					gltf.cameras; // Array<THREE.Camera>
 					gltf.asset; // Object
+					gltf.parser;
+					gltf.userData;
 				},
 				// called while loading is progressing
 				function ( xhr ) {
@@ -45004,7 +45006,6 @@
 					console.log( 'An error happened' );
 				}
 			);
-			
 			loop();
 		}
 	}

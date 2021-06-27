@@ -23,9 +23,9 @@ class App {
 		camera.position.set( 0, 5, 18 );
 		camera.lookAt( 0, 0, 0 );
 
-		const light = new THREE.AmbientLight( 0x404040 );
-		light.position.set(0, 0, 0)
-		light.intensity = 4
+		const light = new THREE.PointLight( 0xffffff );
+		light.position.set(0, 5, 5);
+		light.intensity = 2;
 		scene.add( light );
 
 		//scene
@@ -42,6 +42,8 @@ class App {
 				gltf.scenes; // Array<THREE.Group>
 				gltf.cameras; // Array<THREE.Camera>
 				gltf.asset; // Object
+				gltf.parser;
+				gltf.userData;
 			},
 			// called while loading is progressing
 			function ( xhr ) {
@@ -52,7 +54,6 @@ class App {
 				console.log( 'An error happened' );
 			}
 		)
-		
 		loop();
 	}
 }
