@@ -44956,6 +44956,7 @@
 	//scene
 	let camera, scene, renderer, obj, loaded = false;
 	const video = document.getElementById('video');
+	let videoTexture;
 	//for pad projection moving
 	new Raycaster(); new Vector2();
 	new Vector3(0, 0, 0);
@@ -44971,10 +44972,13 @@
 
 			scene = new Scene();
 			camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 200 );
-			camera.position.set( 0, 10, 18 );
+			camera.position.set( 0, 5, 18 );
 			camera.lookAt( 0, 0, 0 );
 
-			scene.add( new AmbientLight( 0xffffff ) );
+			const light = new AmbientLight( 0x404040 );
+			light.position.set(0, 0, 0);
+			light.intensity = 4;
+			scene.add( light );
 
 			//scene
 			let gltfLoader = new GLTFLoader();
@@ -45001,6 +45005,7 @@
 				}
 			);
 			
+			console.log(video.readyState);
 			renderer.render(scene, camera);
 
 			loop();
@@ -45028,10 +45033,10 @@
 			obj.children[14].children[2].material.emissiveMap = text2;
 			
 			console.log(video.readyState);
-			const texture = new VideoTexture( video );
-			texture.flipY = false;
+			videoTexture = new VideoTexture( video );
+			videoTexture.flipY = false;
 			//console.log(texture);
-			obj.children[13].children[2].material.emissiveMap = texture;
+			obj.children[13].children[2].material.emissiveMap = videoTexture;
 		}
 		
 		requestAnimationFrame(loop);

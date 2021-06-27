@@ -4,6 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 //scene
 let camera, scene, renderer, obj, loaded = false;
 const video = document.getElementById('video');
+let videoTexture;
 //for pad projection moving
 let raycaster = new THREE.Raycaster(), mouse = new THREE.Vector2();
 let intersectPoint = new THREE.Vector3(0, 0, 0);
@@ -19,10 +20,13 @@ class App {
 
 		scene = new THREE.Scene();
 		camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 200 );
-		camera.position.set( 0, 10, 18 );
+		camera.position.set( 0, 5, 18 );
 		camera.lookAt( 0, 0, 0 );
 
-		scene.add( new THREE.AmbientLight( 0xffffff ) );
+		const light = new THREE.AmbientLight( 0x404040 );
+		light.position.set(0, 0, 0)
+		light.intensity = 4
+		scene.add( light );
 
 		//scene
 		let gltfLoader = new GLTFLoader();
@@ -49,6 +53,7 @@ class App {
 			}
 		)
 		
+		console.log(video.readyState)
 		renderer.render(scene, camera);
 
 		loop();
@@ -76,10 +81,10 @@ function loop() {
 		obj.children[14].children[2].material.emissiveMap = text2;
 		
 		console.log(video.readyState)
-		const texture = new THREE.VideoTexture( video );
-		texture.flipY = false;
+		videoTexture = new THREE.VideoTexture( video );
+		videoTexture.flipY = false;
 		//console.log(texture);
-		obj.children[13].children[2].material.emissiveMap = texture;
+		obj.children[13].children[2].material.emissiveMap = videoTexture;
 	}
 	
 	requestAnimationFrame(loop);
