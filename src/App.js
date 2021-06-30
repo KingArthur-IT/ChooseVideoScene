@@ -1,5 +1,8 @@
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import * as THREE 			from 'three';
+import { GLTFLoader } 		from 'three/examples/jsm/loaders/GLTFLoader';
+import { EffectComposer } 	from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } 		from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
 //scene
 let camera, scene, renderer, obj, loaded = false;
@@ -8,6 +11,15 @@ let videoTexture;
 //for pad projection moving
 let raycaster = new THREE.Raycaster(), mouse = new THREE.Vector2();
 let intersectPoint = new THREE.Vector3(0, 0, 0);
+let composer;
+let tvInfo = JSON.parse(sceneInfo); //Get JSON
+
+const params = {
+	exposure: 2.0,
+	bloomStrength: 0.7,
+	bloomThreshold: 0.0,
+	bloomRadius: 0.1
+};
 
 class App {
 	init() {
@@ -20,19 +32,24 @@ class App {
 
 		scene = new THREE.Scene();
 		camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 200 );
-		camera.position.set( 0, 5, 18 );
-		camera.lookAt( 0, 0, 0 );
+		camera.position.set( 0.5, 2.5, 15.7 );
+		camera.lookAt( 0, 2, 0 );
 
-		const light = new THREE.PointLight( 0xffffff );
+		const light = new THREE.PointLight( 0x404040 );
 		light.position.set(0, 5, 5);
 		light.intensity = 2;
-		scene.add( light );
+		scene.add(light);
+
+		const light2 = new THREE.PointLight( 0x12b4e0);
+		light2.position.set(0, 10, -100);
+		light2.intensity = 1;
+		scene.add(light2);
 
 		//scene
 		let gltfLoader = new GLTFLoader();
 		gltfLoader.setPath('./assets/models/');
 		gltfLoader.load(
-			'EVR_WebGL_v4_.gltf',
+			'EVR_WebGL_v10.gltf',
 			function (gltf) {
 				obj = gltf.scene
 				scene.add( obj );
@@ -54,6 +71,18 @@ class App {
 				console.log( 'An error happened' );
 			}
 		)
+
+		const renderScene = new RenderPass( scene, camera );
+
+		const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+		bloomPass.threshold = params.bloomThreshold;
+		bloomPass.strength = params.bloomStrength;
+		bloomPass.radius = params.bloomRadius;
+
+		composer = new EffectComposer( renderer );
+		composer.addPass( renderScene );
+		composer.addPass( bloomPass );
+		
 		loop();
 	}
 }
@@ -61,9 +90,14 @@ class App {
 function loop() {	
 	if (obj !== undefined && !loaded) //&& && video.readyState == 4 !== undefined
 	{
+		console.log(obj)
+		for (let j = 0; j < obj.children.length; j++) {
+			if (obj.children[j].name.includes('girl'))
+				obj.children[j].position.y -= 1;
+		}		
 		loaded = true;
-		//console.log(obj.children[15].children[2]);
-		obj.children[15].children[2].doubleSided = false;
+
+		/*
 		//Load texture
 		let loader = new THREE.TextureLoader();
 		let text1 = loader.load('./assets/img/panda.png', function (texture) {
@@ -77,18 +111,38 @@ function loop() {
 		});
 		obj.children[15].children[2].material.emissiveMap = text1;
 		obj.children[14].children[2].material.emissiveMap = text2;
-		
-		videoTexture = new THREE.VideoTexture( video );
-		console.log(videoTexture)
-		videoTexture.flipY = false;
-		//console.log(texture);
-		obj.children[13].children[2].material.emissiveMap = videoTexture;
-		obj.children[12].children[2].material.emissiveMap = videoTexture;
-		obj.children[11].children[2].material.emissiveMap = videoTexture;
+		//obj.children[14].children[2].material.emissiveIntensity = 10.0;
+		console.log(obj.children[14].children[2].material)
+		*/
+
+		console.log(obj)
+		let tvLastIndex = 0;
+		for (let i = 0; i < tvInfo.length; i++) {
+			const element = tvInfo[i];
+			//<video>
+			let findTV = false;
+			while (!findTV && tvLastIndex < obj.children.length) {
+				if (obj.children[tvLastIndex].name.includes('OLD_TV')) {
+					videoTexture = new THREE.VideoTexture( video );		
+					videoTexture.flipY = false;
+					let layer = 0;
+					for (let i = 1; i < obj.children[tvLastIndex].children.length; i++) {
+						if (obj.children[tvLastIndex].children[i].material.name.includes('screen'))
+							layer = i;
+					}
+					obj.children[tvLastIndex].children[layer].material.emissiveIntensity = 10.0;
+					obj.children[tvLastIndex].children[layer].material.emissiveMap = videoTexture;
+					findTV = true;
+					console.log(tvLastIndex)
+				}
+				tvLastIndex++;
+			}
+		}
 	}
 	
+	composer.render();
 	requestAnimationFrame(loop);
-	renderer.render(scene, camera);
+	//renderer.render(scene, camera);
 }
 
 export default App;
